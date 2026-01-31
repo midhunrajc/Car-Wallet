@@ -9,15 +9,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.app.vehicle.R
 import com.app.vehicle.databinding.FragmentBrandListBinding
 
-class BrandListFragment(
-    private val onBrandSelected: (Brand) -> Unit
-) : Fragment() {
+class BrandListFragment : Fragment() {
 
     private var _binding: FragmentBrandListBinding? = null
     private val binding get() = _binding!!
 
-    // List of brands with logos
-    private val brandList = listOf(
+    private val brands = listOf(
         Brand("Honda", R.drawable.honda),
         Brand("Toyota", R.drawable.yamaha),
         Brand("Maruti", R.drawable.tata),
@@ -25,10 +22,9 @@ class BrandListFragment(
         Brand("Hyundai", R.drawable.hero)
     )
 
-    private lateinit var adapter: BrandAdapter
-
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentBrandListBinding.inflate(inflater, container, false)
@@ -38,15 +34,19 @@ class BrandListFragment(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Initialize adapter
-        adapter = BrandAdapter(brandList) { selectedBrand ->
-            // Callback to AddVehicleFragment
-            onBrandSelected(selectedBrand)
-            //parentFragmentManager.popBackStack()
-        }
-
         binding.rvBrands.layoutManager = LinearLayoutManager(requireContext())
-        binding.rvBrands.adapter = adapter
+        binding.rvBrands.adapter = BrandAdapter(brands) { brand ->
+
+            // ✅ SAFE result delivery
+            parentFragmentManager.setFragmentResult(
+                "brand_result",
+                Bundle().apply {
+                    putString("brand_name", brand.name)
+                }
+            )
+
+            parentFragmentManager.popBackStack()
+        }
     }
 
     override fun onDestroyView() {

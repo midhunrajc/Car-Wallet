@@ -3,61 +3,45 @@ package ui.addVehicle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.app.vehicle.R
 import com.app.vehicle.databinding.ItemBrandBinding
-
-data class Brand(
-    val name: String,
-    val logoRes: Int
-)
 
 class BrandAdapter(
     private val brands: List<Brand>,
     private val onClick: (Brand) -> Unit
-) : RecyclerView.Adapter<BrandAdapter.BrandViewHolder>() {
+) : RecyclerView.Adapter<BrandAdapter.BrandVH>() {
 
-    private var selectedPosition = -1 // track which brand is selected
+    private var selectedPos = -1
 
-    inner class BrandViewHolder(val binding: ItemBrandBinding) : RecyclerView.ViewHolder(binding.root) {
+    inner class BrandVH(private val binding: ItemBrandBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+
         fun bind(brand: Brand, position: Int) {
             binding.tvBrand.text = brand.name
             binding.ivBrandLogo.setImageResource(brand.logoRes)
+            binding.radioBrand.isChecked = position == selectedPos
 
-            // Update radio button state
-            binding.radioBrand.isChecked = position == selectedPosition
-
-            // Click on entire row
-            binding.root.setOnClickListener {
-                updateSelection(position, brand)
-            }
-
-            // Click on radio button itself
-            binding.radioBrand.setOnClickListener {
-                updateSelection(position, brand)
-            }
+            binding.root.setOnClickListener { select(position, brand) }
+            binding.radioBrand.setOnClickListener { select(position, brand) }
         }
 
-        private fun updateSelection(position: Int, brand: Brand) {
-            // Notify previous selected to uncheck
-            val previousPosition = selectedPosition
-            selectedPosition = position
-            notifyItemChanged(previousPosition)
-            notifyItemChanged(selectedPosition)
-
-            // Callback to fragment
+        private fun select(pos: Int, brand: Brand) {
+            val old = selectedPos
+            selectedPos = pos
+            if (old != -1) notifyItemChanged(old)
+            notifyItemChanged(pos)
             onClick(brand)
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BrandViewHolder {
-        val binding = ItemBrandBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return BrandViewHolder(binding)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BrandVH {
+        return BrandVH(
+            ItemBrandBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        )
     }
 
-    override fun getItemCount() = brands.size
-
-    override fun onBindViewHolder(holder: BrandViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: BrandVH, position: Int) {
         holder.bind(brands[position], position)
     }
-}
 
+    override fun getItemCount(): Int = brands.size
+}
