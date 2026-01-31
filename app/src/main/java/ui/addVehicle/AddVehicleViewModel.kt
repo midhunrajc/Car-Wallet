@@ -12,9 +12,14 @@ class AddVehicleViewModel @Inject constructor() : ViewModel() {
 
     private var vehicleNumber: String? = null
     private var ownerName: String? = null
+    private var model: String = ""
 
     fun updateBrand(value: String) {
         brand = value
+    }
+
+    fun updateModel(value: String) {
+        model = value
     }
 
     fun updateVehicleNumber(value: String) {

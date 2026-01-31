@@ -37,7 +37,6 @@ class BrandListFragment : Fragment() {
         binding.rvBrands.layoutManager = LinearLayoutManager(requireContext())
         binding.rvBrands.adapter = BrandAdapter(brands) { brand ->
 
-            // ✅ SAFE result delivery
             parentFragmentManager.setFragmentResult(
                 "brand_result",
                 Bundle().apply {

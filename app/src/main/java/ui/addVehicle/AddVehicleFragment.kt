@@ -31,7 +31,6 @@ class AddVehicleFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // ✅ Listen safely for brand result
         parentFragmentManager.setFragmentResultListener(
             "brand_result",
             viewLifecycleOwner
@@ -44,6 +43,23 @@ class AddVehicleFragment : Fragment() {
         binding.etBrand.setOnClickListener {
             parentFragmentManager.beginTransaction()
                 .replace(R.id.fragmentContainer, BrandListFragment())
+                .addToBackStack(null)
+                .commit()
+        }
+
+        parentFragmentManager.setFragmentResultListener(
+            "model_result",
+            viewLifecycleOwner
+        ) { _, bundle ->
+            val model = bundle.getString("model_name") ?: return@setFragmentResultListener
+
+            binding.etModel.setText(model)
+            viewModel.updateModel(model)
+        }
+
+        binding.etModel.setOnClickListener {
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.fragmentContainer, ModelListFragment())
                 .addToBackStack(null)
                 .commit()
         }
