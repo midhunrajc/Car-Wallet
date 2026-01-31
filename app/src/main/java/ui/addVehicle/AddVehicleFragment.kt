@@ -101,7 +101,7 @@ class AddVehicleFragment : Fragment() {
             viewModel.updateOwnerName(binding.etOwner.text.toString())
             viewModel.saveVehicle()
 
-            Toast.makeText(requireContext(), "Vehicle Added", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Vehicle added", Toast.LENGTH_SHORT).show()
 
             parentFragmentManager.popBackStack()
 
@@ -115,8 +115,12 @@ class AddVehicleFragment : Fragment() {
 
         binding.btnBack.setOnClickListener {
             parentFragmentManager.popBackStack()
-            (activity as MainActivity).binding.fragmentContainer.visibility = View.GONE
-        }
+            val mainActivity = activity as MainActivity
+            mainActivity.binding.fragmentContainer.visibility = View.GONE
+            mainActivity.binding.rvVehicles.visibility = View.VISIBLE
+            mainActivity.binding.btnAddVehicle.visibility = View.VISIBLE
+            mainActivity.binding.topBlue.visibility = View.VISIBLE
+            mainActivity.binding.headerRow.visibility = View.VISIBLE        }
     }
 
     override fun onDestroyView() {
