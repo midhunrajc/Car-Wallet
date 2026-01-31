@@ -90,7 +90,13 @@ class AddVehicleFragment : Fragment() {
             Toast.makeText(requireContext(), "Vehicle Added", Toast.LENGTH_SHORT).show()
 
             parentFragmentManager.popBackStack()
-            (activity as MainActivity).binding.fragmentContainer.visibility = View.GONE
+
+            val mainActivity = activity as MainActivity
+            mainActivity.binding.fragmentContainer.visibility = View.GONE
+            mainActivity.binding.rvVehicles.visibility = View.VISIBLE
+            mainActivity.binding.btnAddVehicle.visibility = View.VISIBLE
+            mainActivity.binding.topBlue.visibility = View.VISIBLE
+            mainActivity.binding.headerRow.visibility = View.VISIBLE
         }
 
         binding.btnBack.setOnClickListener {
