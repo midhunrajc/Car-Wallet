@@ -38,9 +38,12 @@ class AddVehicleFragment : Fragment() {
                 .replace(
                     R.id.fragmentContainer,
                     BrandListFragment { selectedBrand ->
-                        binding.etBrand.setText(selectedBrand) // show selected brand
-                        viewModel.updateBrand(selectedBrand)
-                    })
+                        _binding?.let { binding ->
+                            binding.etBrand.setText(selectedBrand.name)
+                            viewModel.updateBrand(selectedBrand.name)
+                        }
+                    }
+                )
                 .addToBackStack(null)
                 .commit()
         }
