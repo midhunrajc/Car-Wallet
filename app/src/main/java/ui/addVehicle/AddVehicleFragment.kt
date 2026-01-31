@@ -64,6 +64,24 @@ class AddVehicleFragment : Fragment() {
                 .commit()
         }
 
+        parentFragmentManager.setFragmentResultListener(
+            "fuel_result",
+            viewLifecycleOwner
+        ) { _, bundle ->
+            val fuel = bundle.getString("fuel_name") ?: return@setFragmentResultListener
+            binding.etFuel.setText(fuel)
+            viewModel.updateFuelType(fuel)
+        }
+
+
+        binding.etFuel.setOnClickListener {
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.fragmentContainer, FuelTypeListFragment())
+                .addToBackStack(null)
+                .commit()
+        }
+
+
         binding.btnSave.setOnClickListener {
             viewModel.updateVehicleNumber(binding.etVehicleNumber.text.toString())
             viewModel.updateOwnerName(binding.etOwner.text.toString())
