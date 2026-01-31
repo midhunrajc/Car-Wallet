@@ -1,67 +1,65 @@
 package com.app.vehicle
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.GridLayoutManager
+import com.app.vehicle.R
 import com.app.vehicle.databinding.ActivityMainBinding
-import domain.model.Vehicle
-import domain.usecase.AddVehicleUseCase
+import data.local.AppDatabase
+import data.local.entity.toDomain
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import ui.addVehicle.AddVehicleFragment
 import ui.addVehicle.AddVehicleViewModel
+import ui.addVehicle.AddVehicleViewModelFactory
 import ui.home.VehicleAdapter
 
 class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
     private val vehicleAdapter = VehicleAdapter()
+    private lateinit var viewModel: AddVehicleViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // Setup RecyclerView
         binding.rvVehicles.apply {
             adapter = vehicleAdapter
             layoutManager = LinearLayoutManager(this@MainActivity)
         }
 
-        val vehicles = listOf(
-            Vehicle(1, "Honda", "City", "Petrol", "MH01AB1234", 2009, "John"),
-            Vehicle(2, "Toyota", "Corolla", "Diesel", "MH02CD5678", 2010, "Nick" ) ,
-            Vehicle(3, "Maruthi", "Brezza", "Diesel", "KA02CD5678", 2010, "Patove" )
+        // Setup ViewModel
+        val dao = AppDatabase.getInstance(this).vehicleDao()
+        val factory = AddVehicleViewModelFactory(dao)
+        viewModel = ViewModelProvider(this, factory)[AddVehicleViewModel::class.java]
 
-        )
-        vehicleAdapter.submitList(vehicles)
-
-        // Optional: handle item clicks
-        vehicleAdapter.setOnItemClickListener { vehicle ->
-            Toast.makeText(this, "Clicked: ${vehicle.brand}", Toast.LENGTH_SHORT).show()
+        // Observe vehicles from database
+        lifecycleScope.launch {
+            viewModel.allVehicles.collectLatest { entities ->
+                val vehicles = entities.map { it.toDomain() }
+                println("mdn data coming")// convert to domain model
+                vehicleAdapter.submitList(vehicles)
+            }
         }
 
+
+        // Add Vehicle button
         binding.btnAddVehicle.setOnClickListener {
-            // Hide main UI
             binding.rvVehicles.visibility = View.GONE
             binding.topBlue.visibility = View.GONE
             binding.headerRow.visibility = View.GONE
             binding.btnAddVehicle.visibility = View.GONE
-
-            // Show fragment container
             binding.fragmentContainer.visibility = View.VISIBLE
+
             supportFragmentManager.beginTransaction()
                 .replace(R.id.fragmentContainer, AddVehicleFragment())
-                .addToBackStack(null) // allows back navigation
+                .addToBackStack(null)
                 .commit()
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        println("midhun main activity onResume")
     }
 }

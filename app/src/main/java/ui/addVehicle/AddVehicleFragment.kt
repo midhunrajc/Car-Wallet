@@ -1,5 +1,6 @@
 package ui.addVehicle
 
+import com.app.vehicle.MainActivity
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,10 +10,10 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
-import com.app.vehicle.MainActivity
 import com.app.vehicle.R
 import com.app.vehicle.databinding.FragmentAddVehicleBinding
 import data.local.AppDatabase
+
 
 class AddVehicleFragment : Fragment() {
 
@@ -93,6 +94,9 @@ class AddVehicleFragment : Fragment() {
 
 
         binding.btnSave.setOnClickListener {
+            viewModel.updateBrand(binding.etBrand.text.toString())
+            viewModel.updateModel(binding.etModel.text.toString())
+            viewModel.updateFuelType(binding.etFuel.text.toString())
             viewModel.updateVehicleNumber(binding.etVehicleNumber.text.toString())
             viewModel.updateOwnerName(binding.etOwner.text.toString())
             viewModel.saveVehicle()

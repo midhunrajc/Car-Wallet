@@ -2,17 +2,13 @@ package ui.addVehicle
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
 import data.local.dao.VehicleDao
 import data.local.entity.VehicleEntity
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-class AddVehicleViewModel(
-    private val vehicleDao: VehicleDao
-) : ViewModel() {
+class AddVehicleViewModel(private val vehicleDao: VehicleDao) : ViewModel() {
 
     private var brand: String = ""
     private var model: String = ""
@@ -20,52 +16,39 @@ class AddVehicleViewModel(
     private var vehicleNumber: String = ""
     private var ownerName: String = ""
 
+    // Expose all vehicles as StateFlow
     private val _allVehicles = MutableStateFlow<List<VehicleEntity>>(emptyList())
     val allVehicles: StateFlow<List<VehicleEntity>> = _allVehicles
 
-    fun updateBrand(value: String) {
-        brand = value
+    init {
+        // Load all vehicles from DB automatically
+        viewModelScope.launch {
+            vehicleDao.getAllVehicles().collect { list ->
+                _allVehicles.value = list
+            }
+        }
     }
 
-    fun updateFuelType(value: String) {
-        fuelType = value
-    }
-
-
-    fun updateModel(value: String) {
-        model = value
-    }
-
-    fun updateVehicleNumber(value: String) {
-        vehicleNumber = value
-    }
-
-    fun updateOwnerName(value: String) {
-        ownerName = value
-    }
+    // Update methods
+    fun updateBrand(value: String) { brand = value }
+    fun updateModel(value: String) { model = value }
+    fun updateFuelType(value: String) { fuelType = value }
+    fun updateVehicleNumber(value: String) { vehicleNumber = value }
+    fun updateOwnerName(value: String) { ownerName = value }
 
     fun saveVehicle() {
-        println("Saving: brand=$brand number=$vehicleNumber owner=$ownerName")
         val vehicle = VehicleEntity(
             brand = brand,
             model = model,
             fuelType = fuelType,
             vehicleNumber = vehicleNumber,
-            yearOfPurchase = 2026, // temporary, you can use input
+            yearOfPurchase = 2026, // Or get from input
             ownerName = ownerName
         )
 
         viewModelScope.launch {
             vehicleDao.insert(vehicle)
-            refreshVehicles()
-        }
-    }
-
-    fun refreshVehicles() {
-        viewModelScope.launch {
-            vehicleDao.getAllVehicles().collect { list ->
-                _allVehicles.value = list
-            }
+            // No need to refresh manually, flow will emit new list automatically
         }
     }
 }
