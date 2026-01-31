@@ -8,17 +8,18 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
 import com.app.vehicle.MainActivity
 import com.app.vehicle.R
 import com.app.vehicle.databinding.FragmentAddVehicleBinding
+import data.local.AppDatabase
 
 class AddVehicleFragment : Fragment() {
 
     private var _binding: FragmentAddVehicleBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: AddVehicleViewModel by viewModels()
-
+    private lateinit var viewModel: AddVehicleViewModel
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -30,6 +31,15 @@ class AddVehicleFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // Get DAO
+        val dao = AppDatabase.getInstance(requireContext()).vehicleDao()
+
+// Create factory
+        val factory = AddVehicleViewModelFactory(dao)
+
+// Initialize ViewModel with factory
+        viewModel = ViewModelProvider(this, factory)[AddVehicleViewModel::class.java]
 
         parentFragmentManager.setFragmentResultListener(
             "brand_result",

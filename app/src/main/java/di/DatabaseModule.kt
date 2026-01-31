@@ -2,13 +2,13 @@ package di
 
 import android.content.Context
 import androidx.room.Room
-import data.local.database.AppDatabase
 import data.local.dao.VehicleDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import data.local.AppDatabase
 import javax.inject.Singleton
 
 @Module
